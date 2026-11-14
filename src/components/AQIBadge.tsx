@@ -19,15 +19,24 @@ export const AQIBadge: React.FC<AQIBadgeProps> = ({ aqi, size = 'md', showCatego
     xl: 'text-3xl px-5 py-3 font-extrabold',
   };
 
+  const aqiLabel =
+    aqi !== null && aqi !== undefined
+      ? `Air Quality Index ${aqi}, ${cat.category}`
+      : 'Air Quality Index unavailable';
+
   return (
-    <div className="inline-flex items-center gap-2">
+    <div
+      role="status"
+      aria-label={aqiLabel}
+      className="inline-flex items-center gap-2"
+    >
       <span
         className={`inline-flex items-center justify-center rounded-lg border ${cat.badgeClass} ${sizeClasses[size]}`}
       >
         {aqi !== null && aqi !== undefined ? aqi : 'N/A'}
       </span>
       {showCategory && (
-        <span className={`text-xs font-medium ${cat.textColor}`}>
+        <span className={`text-xs font-semibold ${cat.textColor}`}>
           {cat.category}
         </span>
       )}

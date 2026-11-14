@@ -67,6 +67,8 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={() => setModalOpen(true)}
               className="flex items-center gap-2 py-1.5 px-3 rounded-xl hover:bg-slate-50 border border-transparent hover:border-slate-200 transition-all text-left group"
               title="Change city or enter GPS coordinates"
+              aria-label={`Selected location: ${displayLocation || currentLocation.name}. Click to change city or GPS coordinates.`}
+              aria-haspopup="dialog"
             >
               <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
                 <MapPin className="w-4 h-4" />
@@ -100,6 +102,7 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Save Snapshot button */}
             <button
               onClick={onSaveSnapshot}
+              aria-label="Save telemetry snapshot to local history"
               className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
                 savedFeedback
                   ? 'bg-emerald-700 text-white border-emerald-700'
@@ -119,6 +122,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={onRefresh}
               disabled={loading}
+              aria-label="Fetch latest air quality telemetry"
               className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-700 text-white hover:bg-emerald-800 disabled:opacity-60 transition-all shadow-xs"
               title="Fetch latest telemetry"
             >

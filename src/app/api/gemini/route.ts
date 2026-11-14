@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GeminiAnalysisResult, AirQualityResponse } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
 
-function generateDeterministicAnalysis(airData: any, comparisons: any[] = []): any {
+function generateDeterministicAnalysis(
+  airData: AirQualityResponse,
+  comparisons: AirQualityResponse[] = []
+): GeminiAnalysisResult {
   const locName = airData?.location?.name || 'Selected City';
   const aqi = airData?.current?.us_aqi ?? 'N/A';
   const pm25 = airData?.current?.pm2_5 ?? 'N/A';
@@ -189,7 +193,7 @@ export async function POST(request: NextRequest) {
 
     if (apiKey && apiKey.trim().length > 5) {
       try {
-        const genAI = new GoogleGenerativeAI(apiKey);
+        const genAI = new GoogleGenerativeAI(apiKey.trim());
         const model = genAI.getGenerativeModel({
           model: 'gemini-1.5-flash',
           generationConfig: {
@@ -265,7 +269,13 @@ Return ONLY valid JSON matching this exact structure:
   "health_advisory": "string"
 }`;
 
-        const result = await model.generateContent(prompt);
+        // Timeout race for Gemini API (max 12s before graceful fallback)
+        const geminiPromise = model.generateContent(prompt);
+        const timeoutPromise = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('Gemini API call timed out after 12s')), 12000)
+        );
+
+        const result: any = await Promise.race([geminiPromise, timeoutPromise]);
         const text = result.response.text();
         const parsed = JSON.parse(text);
 
@@ -277,7 +287,10 @@ Return ONLY valid JSON matching this exact structure:
 
         return NextResponse.json(parsed);
       } catch (geminiError: any) {
-        console.warn('Gemini API call failed, falling back to deterministic intelligence engine:', geminiError);
+        console.warn(
+          'Gemini API call unavailable or timed out; activating deterministic intelligence engine:',
+          geminiError.message
+        );
       }
     }
 

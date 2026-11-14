@@ -1,4 +1,4 @@
-import { ReportSnapshot, ComparisonDelta, CurrentPollutants, StakeholderRole, StakeholderRecommendation } from './types';
+import type { ReportSnapshot, ComparisonDelta, CurrentPollutants, StakeholderRole, StakeholderRecommendation } from './types';
 
 const SNAPSHOTS_KEY = 'airsathi_snapshots_v1';
 const LOCATIONS_KEY = 'airsathi_locations_v1';

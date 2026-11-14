@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { AirQualityResponse } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
 
@@ -6,8 +7,9 @@ export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const latStr = searchParams.get('latitude') || searchParams.get('lat');
   const lonStr = searchParams.get('longitude') || searchParams.get('lon');
-  const cityName = searchParams.get('name') || 'Selected Location';
+  const rawCityName = searchParams.get('name') || 'Selected Location';
 
+  // 1. Parameter presence validation
   if (!latStr || !lonStr) {
     return NextResponse.json(
       { error: 'Missing latitude or longitude parameter.' },
@@ -18,12 +20,26 @@ export async function GET(request: NextRequest) {
   const latitude = parseFloat(latStr);
   const longitude = parseFloat(lonStr);
 
-  if (isNaN(latitude) || isNaN(longitude)) {
+  // 2. Strict Numeric & Geographic Boundary Validation (-90 to 90, -180 to 180)
+  if (
+    isNaN(latitude) ||
+    isNaN(longitude) ||
+    latitude < -90 ||
+    latitude > 90 ||
+    longitude < -180 ||
+    longitude > 180
+  ) {
     return NextResponse.json(
-      { error: 'Invalid numeric coordinates provided.' },
+      {
+        error:
+          'Invalid coordinates. Latitude must be between -90 and 90, and longitude between -180 and 180.',
+      },
       { status: 400 }
     );
   }
+
+  // 3. String sanitization for cityName
+  const cityName = rawCityName.trim().slice(0, 100);
 
   const openMeteoUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${latitude}&longitude=${longitude}&current=pm10,pm2_5,carbon_monoxide,nitrogen_dioxide,sulphur_dioxide,ozone,us_aqi,european_aqi&hourly=pm10,pm2_5,nitrogen_dioxide,sulphur_dioxide,carbon_monoxide,ozone,us_aqi,european_aqi&past_days=2&forecast_days=3&timezone=Asia%2FKolkata`;
 
@@ -35,7 +51,7 @@ export async function GET(request: NextRequest) {
       signal: controller.signal,
       next: { revalidate: 300 }, // 5 min cache
       headers: {
-        'Accept': 'application/json',
+        Accept: 'application/json',
       },
     });
 
@@ -55,15 +71,14 @@ export async function GET(request: NextRequest) {
 
     const data = await res.json();
 
-    const formattedResponse = {
+    const formattedResponse: AirQualityResponse = {
       location: {
         id: `${latitude.toFixed(4)}_${longitude.toFixed(4)}`,
         name: cityName,
+        country: 'India',
         latitude: data.latitude ?? latitude,
         longitude: data.longitude ?? longitude,
         elevation: data.elevation ?? 0,
-        timezone: data.timezone,
-        timezone_abbreviation: data.timezone_abbreviation,
       },
       current: {
         time: data.current?.time ?? new Date().toISOString(),
@@ -100,7 +115,7 @@ export async function GET(request: NextRequest) {
       source: {
         provider: 'Open-Meteo Air Quality API',
         model: 'Copernicus Atmosphere Monitoring Service (CAMS) Global & Regional Ensemble',
-        classification: 'model_estimate' as const,
+        classification: 'model_estimate',
         description:
           'Values are CAMS-based atmospheric numerical model estimates, not direct physical monitoring-station measurements.',
         retrievedAt: new Date().toISOString(),
@@ -110,15 +125,22 @@ export async function GET(request: NextRequest) {
         'Model grid cell resolution is approximately 11km to 40km. Micro-local or ward-level variations within the same grid cell resolve to identical modelled baseline values.',
     };
 
-    return NextResponse.json(formattedResponse);
+    return NextResponse.json(formattedResponse, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+      },
+    });
   } catch (err: any) {
+    const isTimeout = err.name === 'AbortError';
     return NextResponse.json(
       {
-        error: 'Failed to retrieve real-time air quality data from Open-Meteo.',
+        error: isTimeout
+          ? 'Open-Meteo API request timed out after 12 seconds.'
+          : 'Failed to retrieve real-time air quality data from Open-Meteo.',
         details: err.message || String(err),
         provider: 'Open-Meteo',
       },
-      { status: 502 }
+      { status: isTimeout ? 504 : 502 }
     );
   }
 }

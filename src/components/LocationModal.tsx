@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, MapPin, X, Loader2, Compass } from 'lucide-react';
 import { CityLocation } from '@/lib/types';
 import { DEFAULT_CITIES } from '@/lib/aqi-utils';
@@ -24,6 +24,18 @@ export const LocationModal: React.FC<LocationModalProps> = ({
   const [customName, setCustomName] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
+  // Close on Escape key press
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const handleSearch = async (e: React.FormEvent) => {
@@ -42,7 +54,7 @@ export const LocationModal: React.FC<LocationModalProps> = ({
         setResults([]);
         setErrorMsg(`No coordinates found for "${query}". Try standard city names like Bhopal, Indore, Jaipur.`);
       }
-    } catch (err: any) {
+    } catch {
       setErrorMsg('Geocoding service network lookup failed.');
     } finally {
       setSearching(false);
@@ -73,21 +85,29 @@ export const LocationModal: React.FC<LocationModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="location-modal-title"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in"
+    >
       <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200">
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-slate-100 bg-slate-50/50">
           <div className="flex items-center gap-2">
-            <div className="p-2 rounded-lg bg-emerald-100 text-emerald-700">
+            <div className="p-2 rounded-lg bg-emerald-100 text-emerald-700" aria-hidden="true">
               <MapPin className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-900">Select Civic Monitoring Location</h3>
+              <h3 id="location-modal-title" className="text-base font-bold text-slate-900">
+                Select Civic Monitoring Location
+              </h3>
               <p className="text-xs text-slate-500">Live coordinates drive Open-Meteo API requests</p>
             </div>
           </div>
           <button
             onClick={onClose}
+            aria-label="Close location selector modal"
             className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
           >
             <X className="w-5 h-5" />
@@ -118,13 +138,14 @@ export const LocationModal: React.FC<LocationModalProps> = ({
 
           {/* Search form */}
           <div>
-            <label className="text-xs font-bold text-slate-600 block mb-2 uppercase tracking-wider">
+            <label htmlFor="city-search-input" className="text-xs font-bold text-slate-600 block mb-2 uppercase tracking-wider">
               Search Any City or Town
             </label>
             <form onSubmit={handleSearch} className="flex gap-2">
               <div className="relative flex-1">
-                <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+                <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" aria-hidden="true" />
                 <input
+                  id="city-search-input"
                   type="text"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
@@ -135,6 +156,7 @@ export const LocationModal: React.FC<LocationModalProps> = ({
               <button
                 type="submit"
                 disabled={searching}
+                aria-label="Search city coordinates"
                 className="px-4 py-2 bg-emerald-600 text-white rounded-lg text-xs font-semibold hover:bg-emerald-700 disabled:opacity-60 flex items-center gap-1.5 shrink-0"
               >
                 {searching ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Search'}
@@ -144,7 +166,7 @@ export const LocationModal: React.FC<LocationModalProps> = ({
 
           {/* Search Results */}
           {errorMsg && (
-            <p className="text-xs text-rose-600 bg-rose-50 p-2.5 rounded-lg border border-rose-200">
+            <p role="alert" className="text-xs text-rose-600 bg-rose-50 p-2.5 rounded-lg border border-rose-200">
               {errorMsg}
             </p>
           )}
@@ -181,14 +203,15 @@ export const LocationModal: React.FC<LocationModalProps> = ({
           <div className="pt-3 border-t border-slate-200">
             <details className="text-xs">
               <summary className="font-semibold text-slate-600 cursor-pointer hover:text-emerald-700 flex items-center gap-1">
-                <Compass className="w-3.5 h-3.5" />
+                <Compass className="w-3.5 h-3.5" aria-hidden="true" />
                 Enter Exact GPS Latitude & Longitude
               </summary>
               <form onSubmit={handleApplyCustomCoords} className="mt-3 space-y-2.5">
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="text-[10px] text-slate-500 uppercase font-bold">Latitude</label>
+                    <label htmlFor="custom-lat-input" className="text-[10px] text-slate-500 uppercase font-bold">Latitude</label>
                     <input
+                      id="custom-lat-input"
                       type="number"
                       step="any"
                       placeholder="23.2599"
@@ -198,8 +221,9 @@ export const LocationModal: React.FC<LocationModalProps> = ({
                     />
                   </div>
                   <div>
-                    <label className="text-[10px] text-slate-500 uppercase font-bold">Longitude</label>
+                    <label htmlFor="custom-lon-input" className="text-[10px] text-slate-500 uppercase font-bold">Longitude</label>
                     <input
+                      id="custom-lon-input"
                       type="number"
                       step="any"
                       placeholder="77.4126"
@@ -210,8 +234,9 @@ export const LocationModal: React.FC<LocationModalProps> = ({
                   </div>
                 </div>
                 <div>
-                  <label className="text-[10px] text-slate-500 uppercase font-bold">Custom Label (Optional)</label>
+                  <label htmlFor="custom-label-input" className="text-[10px] text-slate-500 uppercase font-bold">Custom Label (Optional)</label>
                   <input
+                    id="custom-label-input"
                     type="text"
                     placeholder="e.g. Arera Colony Ward 48"
                     value={customName}

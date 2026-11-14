@@ -95,6 +95,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {onCloseMobile && (
           <button
             onClick={onCloseMobile}
+            aria-label="Close navigation menu"
             className="md:hidden p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"
           >
             <X className="w-5 h-5" />
@@ -103,7 +104,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* Nav Menu */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-1">
+      <nav aria-label="Main Navigation" className="flex-1 overflow-y-auto p-3 space-y-1">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
@@ -111,6 +112,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               key={item.id}
               onClick={() => handleNavClick(item.id)}
+              aria-current={isActive ? 'page' : undefined}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all ${
                 isActive
                   ? 'bg-emerald-700 text-white font-semibold shadow-xs'
@@ -131,7 +133,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </button>
           );
         })}
-      </div>
+      </nav>
 
       {/* Compact Status Indicator */}
       <div className="p-4 border-t border-slate-100 bg-slate-50/50 text-[11px] text-slate-500 space-y-1">
