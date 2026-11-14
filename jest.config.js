@@ -7,8 +7,8 @@ module.exports = {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
   testMatch: [
-    '<rootDir>/tests/**/*.test.ts',
-    '<rootDir>/src/**/__tests__/**/*.test.ts',
+    '<rootDir>/tests/**/*.test.{ts,tsx}',
+    '<rootDir>/src/**/__tests__/**/*.{ts,tsx}',
   ],
   transform: {
     '^.+\\.tsx?$': [

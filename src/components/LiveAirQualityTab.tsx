@@ -224,6 +224,47 @@ export const LiveAirQualityTab: React.FC<LiveAirQualityTabProps> = ({
         </div>
       </div>
 
+      {/* Multi-Source Atmospheric Sensor Network & Station Registry */}
+      <div className="p-5 rounded-2xl border border-slate-200/90 bg-white shadow-xs space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+            Public Telemetry &amp; Sensor Network Registry
+          </div>
+          <span className="text-[10px] font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+            Open-Meteo Primary Active
+          </span>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+          <div className="p-3 rounded-xl border border-emerald-200 bg-emerald-50/50 space-y-1">
+            <div className="flex items-center justify-between">
+              <strong className="text-emerald-900">Open-Meteo CAMS</strong>
+              <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+            </div>
+            <p className="text-[11px] text-emerald-800">
+              Active primary provider. Global numerical atmospheric model (~11–40km grid cell).
+            </p>
+          </div>
+          <div className="p-3 rounded-xl border border-slate-200 bg-slate-50 space-y-1">
+            <div className="flex items-center justify-between">
+              <strong className="text-slate-800">CPCB / Data.gov.in</strong>
+              <span className="text-[10px] text-slate-500 font-mono">Configurable</span>
+            </div>
+            <p className="text-[11px] text-slate-500">
+              National physical station network. Requires DATA_GOV_IN_API_KEY. Primary fallback active.
+            </p>
+          </div>
+          <div className="p-3 rounded-xl border border-slate-200 bg-slate-50 space-y-1">
+            <div className="flex items-center justify-between">
+              <strong className="text-slate-800">OpenAQ v3 API</strong>
+              <span className="text-[10px] text-slate-500 font-mono">Optional</span>
+            </div>
+            <p className="text-[11px] text-slate-500">
+              Global open sensor network. Requires OPENAQ_API_KEY. Primary fallback active.
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Grid disclosure note */}
       <div className="p-4 rounded-xl border border-slate-200 bg-white text-xs text-slate-500 flex items-start gap-2.5">
         <Info className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />

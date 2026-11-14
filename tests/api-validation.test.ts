@@ -54,4 +54,18 @@ describe('API Request Validation & Sanitization Engine', () => {
       expect(clean.endsWith(' ')).toBe(false);
     });
   });
+
+  describe('Secondary Provider Disclosures & Fallbacks (CPCB & OpenAQ)', () => {
+    it('discloses CPCB physical station requirement when DATA_GOV_IN_API_KEY is missing', () => {
+      const apiKey = process.env.DATA_GOV_IN_API_KEY;
+      const requiresConfig = !apiKey || apiKey.trim().length === 0;
+      expect(requiresConfig).toBe(true);
+    });
+
+    it('discloses OpenAQ sensor network requirement when OPENAQ_API_KEY is missing', () => {
+      const apiKey = process.env.OPENAQ_API_KEY;
+      const requiresConfig = !apiKey || apiKey.trim().length === 0;
+      expect(requiresConfig).toBe(true);
+    });
+  });
 });

@@ -44,49 +44,58 @@ export const HotspotsTrendsTab: React.FC<HotspotsTrendsTabProps> = ({
 }) => {
   const [selectedMetric, setSelectedMetric] = useState<string>('us_aqi');
 
+  // Format hourly chart data (memoized to eliminate redundant Date parsing on every render)
+  const chartData = React.useMemo(() => {
+    if (!currentAirData) return [];
+    const hourly = currentAirData.hourly;
+    return (hourly.time || [])
+      .map((timeStr, i) => {
+        const d = new Date(timeStr);
+        const isPast = d < new Date();
+        return {
+          time: timeStr,
+          displayTime: formatHourOnly(timeStr),
+          date: d.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }),
+          us_aqi: hourly.us_aqi[i],
+          pm2_5: hourly.pm2_5[i],
+          pm10: hourly.pm10[i],
+          nitrogen_dioxide: hourly.nitrogen_dioxide[i],
+          ozone: hourly.ozone[i],
+          carbon_monoxide: hourly.carbon_monoxide[i],
+          sulphur_dioxide: hourly.sulphur_dioxide[i],
+          isPast,
+        };
+      })
+      .filter((_, idx) => idx % 2 === 0); // sample every 2 hours
+  }, [currentAirData]);
+
+  // Comparison Bar Chart data (memoized)
+  const comparisonData = React.useMemo(() => {
+    return multiLocationsData.map((d) => ({
+      name: d.location.name,
+      aqi: d.current.us_aqi ?? 0,
+      pm2_5: d.current.pm2_5 ?? 0,
+      pm10: d.current.pm10 ?? 0,
+      no2: d.current.nitrogen_dioxide ?? 0,
+    }));
+  }, [multiLocationsData]);
+
+  // Identify highest pollution location (memoized)
+  const highestLocation = React.useMemo(() => {
+    return [...multiLocationsData].sort(
+      (a, b) => (b.current.us_aqi ?? 0) - (a.current.us_aqi ?? 0)
+    )[0];
+  }, [multiLocationsData]);
+
+  const availableCitiesToAdd = React.useMemo(() => {
+    return DEFAULT_CITIES.filter(
+      (c) => !multiLocationsData.some((m) => m.location.name.toLowerCase() === c.name.toLowerCase())
+    );
+  }, [multiLocationsData]);
+
   if (!currentAirData) {
     return <div className="p-8 text-center text-slate-500">No air data loaded.</div>;
   }
-
-  // Format hourly chart data (sampling every 2-3 hours for clean rendering)
-  const hourly = currentAirData.hourly;
-  const chartData = (hourly.time || [])
-    .map((timeStr, i) => {
-      const d = new Date(timeStr);
-      const isPast = d < new Date();
-      return {
-        time: timeStr,
-        displayTime: formatHourOnly(timeStr),
-        date: d.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }),
-        us_aqi: hourly.us_aqi[i],
-        pm2_5: hourly.pm2_5[i],
-        pm10: hourly.pm10[i],
-        nitrogen_dioxide: hourly.nitrogen_dioxide[i],
-        ozone: hourly.ozone[i],
-        carbon_monoxide: hourly.carbon_monoxide[i],
-        sulphur_dioxide: hourly.sulphur_dioxide[i],
-        isPast,
-      };
-    })
-    .filter((_, idx) => idx % 2 === 0); // sample every 2 hours
-
-  // Comparison Bar Chart data
-  const comparisonData = multiLocationsData.map((d) => ({
-    name: d.location.name,
-    aqi: d.current.us_aqi ?? 0,
-    pm2_5: d.current.pm2_5 ?? 0,
-    pm10: d.current.pm10 ?? 0,
-    no2: d.current.nitrogen_dioxide ?? 0,
-  }));
-
-  // Identify highest pollution location
-  const highestLocation = [...multiLocationsData].sort(
-    (a, b) => (b.current.us_aqi ?? 0) - (a.current.us_aqi ?? 0)
-  )[0];
-
-  const availableCitiesToAdd = DEFAULT_CITIES.filter(
-    (c) => !multiLocationsData.some((m) => m.location.name.toLowerCase() === c.name.toLowerCase())
-  );
 
   return (
     <div className="space-y-6">
