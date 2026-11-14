@@ -10,7 +10,6 @@ import { HotspotsTrendsTab } from '@/components/HotspotsTrendsTab';
 import { RecommendationsTab } from '@/components/RecommendationsTab';
 import { BriefingsTab } from '@/components/BriefingsTab';
 import { PreviousReportsTab } from '@/components/PreviousReportsTab';
-import { DataUploadTab } from '@/components/DataUploadTab';
 import { CityLocation, AirQualityResponse, GeminiAnalysisResult, ReportSnapshot } from '@/lib/types';
 import { DEFAULT_CITIES } from '@/lib/aqi-utils';
 import {
@@ -313,8 +312,6 @@ export default function Home() {
               onLoadSnapshot={handleLoadSnapshot}
             />
           )}
-
-          {activeTab === 'upload' && <DataUploadTab />}
         </main>
       </div>
     </div>

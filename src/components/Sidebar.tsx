@@ -8,7 +8,6 @@ import {
   ShieldAlert,
   FileText,
   History,
-  UploadCloud,
   X,
 } from 'lucide-react';
 
@@ -18,8 +17,7 @@ export type NavTab =
   | 'intelligence'
   | 'recommendations'
   | 'briefings'
-  | 'reports'
-  | 'upload';
+  | 'reports';
 
 interface SidebarProps {
   activeTab: NavTab;
@@ -133,21 +131,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </button>
           );
         })}
-
-        {/* Secondary CSV tool */}
-        <div className="pt-3 mt-3 border-t border-slate-100">
-          <button
-            onClick={() => handleNavClick('upload')}
-            className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-left transition-all ${
-              activeTab === 'upload'
-                ? 'bg-emerald-700 text-white font-semibold shadow-xs'
-                : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800 font-medium'
-            }`}
-          >
-            <UploadCloud className="w-4 h-4 shrink-0 text-slate-400" />
-            <span className="text-xs truncate">Data Upload (CSV)</span>
-          </button>
-        </div>
       </div>
 
       {/* Compact Status Indicator */}

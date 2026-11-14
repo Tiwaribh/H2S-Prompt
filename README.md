@@ -57,12 +57,6 @@ AirSathi is an API-driven civic intelligence dashboard built for the Google for 
    - Comparative delta engine calculates changes in AQI and pollutants (+/- delta and % change).
    - Enforces compatible unit, provider, and measurement matching; never treats missing values as zero.
 
-8. **External Data Upload & Tabular Audit (`Data Upload Tab`)**:
-   - Ingests CSV/TSV files and pasted tabular data.
-   - Handles messy column names (`PM2.5(ug/m3)`, `pm_25`, `no2`, etc.).
-   - Issues data-quality warnings.
-   - Strictly isolated with an explicit **"Uploaded Data (Non-API)"** tag to prevent mixing with live API streams.
-
 ---
 
 ## 3. APIs Integrated & Classification

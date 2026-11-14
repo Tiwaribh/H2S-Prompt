@@ -136,25 +136,3 @@ export interface ComparisonDelta {
   compatible: boolean;
   note?: string;
 }
-
-export interface UploadedDataRow {
-  timestamp?: string;
-  location?: string;
-  pm2_5?: number;
-  pm10?: number;
-  no2?: number;
-  so2?: number;
-  co?: number;
-  o3?: number;
-  aqi?: number;
-  raw: Record<string, any>;
-}
-
-export interface UploadedDataset {
-  filename: string;
-  uploadedAt: string;
-  rowCount: number;
-  columnsDetected: string[];
-  rows: UploadedDataRow[];
-  warnings: string[];
-}
