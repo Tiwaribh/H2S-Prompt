@@ -7,12 +7,7 @@ import {
   TrendingDown,
   Minus,
   Trash2,
-  ExternalLink,
   Clock,
-  MapPin,
-  AlertCircle,
-  CheckCircle2,
-  Layers,
   ArrowRight,
   Info,
 } from 'lucide-react';
@@ -39,7 +34,6 @@ export const PreviousReportsTab: React.FC<PreviousReportsTabProps> = ({
 
   const selectedSnapshot = snapshots.find((s) => s.id === selectedSnapshotId);
 
-  // Compute delta if both current and snapshot exist
   let deltas: ComparisonDelta[] = [];
   if (currentAirData && selectedSnapshot) {
     const isProviderMatch =
@@ -61,38 +55,38 @@ export const PreviousReportsTab: React.FC<PreviousReportsTabProps> = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-5xl mx-auto">
       {/* Header */}
-      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div>
           <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-            <History className="w-5 h-5 text-emerald-600" />
-            Previous Report Snapshots & Telemetry Comparison
+            <History className="w-5 h-5 text-emerald-700" />
+            Previous Report Snapshots & Comparisons
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
             Compare live atmospheric readings against previously saved municipal snapshots
           </p>
         </div>
 
-        <span className="text-xs font-semibold px-3 py-1 rounded-full bg-slate-100 text-slate-700">
-          {snapshots.length} Snapshot{snapshots.length === 1 ? '' : 's'} Stored in Browser
+        <span className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 border border-slate-200 self-start md:self-auto">
+          {snapshots.length} Stored Snapshot{snapshots.length === 1 ? '' : 's'}
         </span>
       </div>
 
       {snapshots.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center space-y-3">
-          <History className="w-12 h-12 text-slate-300 mx-auto" />
-          <h3 className="text-base font-bold text-slate-800">No Previous Snapshots Saved</h3>
+        <div className="bg-white rounded-2xl border border-slate-200/90 p-12 text-center space-y-3 shadow-xs">
+          <History className="w-10 h-10 text-slate-300 mx-auto" />
+          <h3 className="text-sm font-bold text-slate-800">No Previous Snapshots Saved</h3>
           <p className="text-xs text-slate-500 max-w-sm mx-auto">
-            Click "Save Snapshot" in the top header while viewing any city's live air data to benchmark future changes.
+            Click "Save" in the top header while viewing any city's live air data to benchmark future changes.
           </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Snapshots List */}
-          <div className="lg:col-span-1 bg-white p-4 rounded-2xl border border-slate-200 shadow-xs space-y-2">
+          <div className="lg:col-span-1 bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs space-y-2">
             <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider px-2 py-1">
-              Saved Telemetry Snapshots
+              Saved Snapshots
             </h3>
 
             <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
@@ -107,8 +101,8 @@ export const PreviousReportsTab: React.FC<PreviousReportsTabProps> = ({
                     onClick={() => setSelectedSnapshotId(snap.id)}
                     className={`p-3 rounded-xl border cursor-pointer transition-all ${
                       isSelected
-                        ? 'border-emerald-500 bg-emerald-50/50 ring-1 ring-emerald-500/30'
-                        : 'border-slate-200 hover:border-slate-300 bg-slate-50/50 hover:bg-slate-50'
+                        ? 'border-emerald-700 bg-emerald-50/50 shadow-xs'
+                        : 'border-slate-200/80 hover:border-slate-300 bg-slate-50/40 hover:bg-slate-50'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1.5">
@@ -146,30 +140,27 @@ export const PreviousReportsTab: React.FC<PreviousReportsTabProps> = ({
           {/* Comparison Delta View */}
           <div className="lg:col-span-2 space-y-4">
             {selectedSnapshot && currentAirData && (
-              <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-2">
+              <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3.5 border-b border-slate-100 gap-2">
                   <div>
                     <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
                       <span>Live ({currentAirData.location.name})</span>
                       <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
-                      <span className="text-emerald-700">Snapshot ({selectedSnapshot.locationName})</span>
+                      <span className="text-emerald-800">Snapshot ({selectedSnapshot.locationName})</span>
                     </h3>
-                    <p className="text-[11px] text-slate-500 mt-0.5">
-                      Snapshot taken: {formatTime(selectedSnapshot.createdAt)}
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Saved: {formatTime(selectedSnapshot.createdAt)}
                     </p>
                   </div>
 
-                  <span className="text-[11px] font-semibold px-2.5 py-1 rounded bg-teal-50 text-teal-800 border border-teal-200">
+                  <span className="text-xs font-semibold px-2.5 py-0.5 rounded-lg bg-slate-100 text-slate-700 border border-slate-200 self-start sm:self-auto">
                     {selectedSnapshot.classification}
                   </span>
                 </div>
 
                 {/* Compatibility disclosure */}
-                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/80 text-xs text-slate-600">
-                  <div className="flex items-center gap-1.5 font-bold text-slate-700 mb-0.5">
-                    <Info className="w-3.5 h-3.5 text-emerald-600" />
-                    Compatible Unit & Model Delta Analysis
-                  </div>
+                <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 text-xs text-slate-600 flex items-start gap-2">
+                  <Info className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
                   <p className="text-[11px] text-slate-500 leading-relaxed">
                     Comparison only factors matching pollutant units (µg/m³) and identical numerical atmosphere simulations. Missing readings are never treated as zero.
                   </p>
@@ -183,7 +174,7 @@ export const PreviousReportsTab: React.FC<PreviousReportsTabProps> = ({
                     const isAqiOrPm = d.metric.includes('AQI') || d.metric.includes('PM');
 
                     return (
-                      <div key={idx} className="py-3 flex items-center justify-between gap-3 text-xs">
+                      <div key={idx} className="py-2.5 flex items-center justify-between gap-3 text-xs">
                         <div className="min-w-0">
                           <div className="font-semibold text-slate-800 truncate">{d.metric}</div>
                           <div className="text-[11px] text-slate-500 font-mono mt-0.5">
@@ -201,7 +192,7 @@ export const PreviousReportsTab: React.FC<PreviousReportsTabProps> = ({
                                     ? 'text-rose-600'
                                     : 'text-amber-600'
                                   : isDecrease
-                                  ? 'text-emerald-600'
+                                  ? 'text-emerald-700'
                                   : 'text-slate-500'
                               }`}
                             >

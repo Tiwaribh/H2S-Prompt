@@ -8,9 +8,7 @@ import {
   Printer,
   Check,
   Languages,
-  Sparkles,
   BookOpen,
-  Info,
   Building,
   Users,
 } from 'lucide-react';
@@ -22,14 +20,18 @@ interface BriefingsTabProps {
   analysis: GeminiAnalysisResult | null;
 }
 
-export const BriefingsTab: React.FC<BriefingsTabProps> = ({ airData, analysis }) => {
+export const BriefingsTab: React.FC<BriefingsTabProps> = ({ airData }) => {
   const [reportType, setReportType] = useState<'internal' | 'citizen'>('internal');
   const [language, setLanguage] = useState<'en' | 'hi'>('en');
   const [readingLevel, setReadingLevel] = useState<'standard' | 'simple'>('standard');
   const [copied, setCopied] = useState(false);
 
   if (!airData) {
-    return <div className="p-8 text-center text-slate-500">No telemetry loaded.</div>;
+    return (
+      <div className="p-8 text-center text-slate-500 bg-white rounded-2xl border border-slate-200 max-w-lg mx-auto">
+        No telemetry loaded.
+      </div>
+    );
   }
 
   const { current, location, source } = airData;
@@ -42,7 +44,7 @@ export const BriefingsTab: React.FC<BriefingsTabProps> = ({ airData, analysis })
 Document Ref: AS-INTERNAL-${location.name.toUpperCase()}-${Date.now().toString().slice(-6)}
 Generated: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}
 Data Source: ${source.provider} (${source.model})
-Telemetry Classification: ${source.classification === 'model_estimate' ? 'Model Estimate (CAMS Assimilated)' : 'Station Observed'}
+Telemetry Classification: Model Estimate (CAMS Numerical Simulation)
 Data Timestamp: ${formatTime(current.time)}
 Target Municipality / Area: ${location.name} (Lat: ${location.latitude.toFixed(4)}°, Lon: ${location.longitude.toFixed(4)}°)
 
@@ -66,7 +68,7 @@ Analysis indicates primary respiratory stress is induced by ${
 ============================================================
 - Telemetry is retrieved directly from the Copernicus Atmosphere Monitoring Service (CAMS) numerical atmospheric simulation ensemble via Open-Meteo.
 - Grid Cell Resolution: Approximately 0.1° to 0.25° (~11km to ~40km).
-- Notice: Spatial variations within this municipal grid cell resolve to the same regional atmospheric baseline. Ward officers should note that localized street canyon hotspots may exceed this regional average.
+- Notice: Spatial variations within this municipal grid cell resolve to the same regional atmospheric baseline. Localized street canyon hotspots may exceed this regional average.
 
 ============================================================
 3. PRIORITY CIVIC INTERVENTIONS
@@ -257,8 +259,8 @@ ${aqiCat.healthImpact}
           <style>
             body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 40px; color: #0f172a; line-height: 1.6; }
             pre { white-space: pre-wrap; font-family: inherit; font-size: 14px; }
-            .header { border-bottom: 2px solid #059669; padding-bottom: 12px; margin-bottom: 24px; }
-            .title { font-size: 20px; font-weight: bold; color: #059669; }
+            .header { border-bottom: 2px solid #15803d; padding-bottom: 12px; margin-bottom: 24px; }
+            .title { font-size: 20px; font-weight: bold; color: #15803d; }
           </style>
         </head>
         <body>
@@ -275,16 +277,16 @@ ${aqiCat.healthImpact}
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-5xl mx-auto">
       {/* Header and Controls */}
-      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-            <FileText className="w-5 h-5 text-emerald-600" />
-            Civic Briefing & Citizen Advisory Generator
+            <FileText className="w-5 h-5 text-emerald-700" />
+            Civic Briefings & Citizen Advisories
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            Auto-generate technical municipal briefings and plain-language citizen advisories
+            Generate standardized technical briefings and bilingual public health advisories
           </p>
         </div>
 
@@ -292,39 +294,39 @@ ${aqiCat.healthImpact}
         <div className="flex items-center gap-2">
           <button
             onClick={handleCopy}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-300 hover:bg-slate-50 text-slate-700 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-200 hover:bg-slate-50 text-slate-700 transition-colors"
           >
-            {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-            <span>{copied ? 'Copied!' : 'Copy'}</span>
+            {copied ? <Check className="w-3.5 h-3.5 text-emerald-700" /> : <Copy className="w-3.5 h-3.5 text-slate-500" />}
+            <span>{copied ? 'Copied' : 'Copy'}</span>
           </button>
           <button
             onClick={handleDownloadTxt}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-300 hover:bg-slate-50 text-slate-700 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-200 hover:bg-slate-50 text-slate-700 transition-colors"
           >
-            <Download className="w-3.5 h-3.5" />
-            <span>Download TXT</span>
+            <Download className="w-3.5 h-3.5 text-slate-500" />
+            <span>Download</span>
           </button>
           <button
             onClick={handlePrint}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 text-white hover:bg-emerald-700 transition-colors shadow-xs"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-700 text-white hover:bg-emerald-800 transition-colors shadow-xs"
           >
             <Printer className="w-3.5 h-3.5" />
-            <span>Print / HTML</span>
+            <span>Print HTML</span>
           </button>
         </div>
       </div>
 
       {/* Selector Options */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-3 text-xs">
+      <div className="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs flex flex-wrap items-center justify-between gap-3 text-xs">
         {/* Report Type Selector */}
         <div className="flex items-center gap-2">
-          <span className="font-bold text-slate-700">Document Type:</span>
-          <div className="flex bg-slate-100 p-1 rounded-lg">
+          <span className="font-semibold text-slate-700">Document Type:</span>
+          <div className="flex bg-slate-100 p-1 rounded-xl">
             <button
               onClick={() => setReportType('internal')}
-              className={`px-3 py-1 rounded font-semibold transition-all flex items-center gap-1.5 ${
+              className={`px-3 py-1 rounded-lg font-semibold transition-all flex items-center gap-1.5 ${
                 reportType === 'internal'
-                  ? 'bg-white text-emerald-800 shadow-xs'
+                  ? 'bg-emerald-700 text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -333,9 +335,9 @@ ${aqiCat.healthImpact}
             </button>
             <button
               onClick={() => setReportType('citizen')}
-              className={`px-3 py-1 rounded font-semibold transition-all flex items-center gap-1.5 ${
+              className={`px-3 py-1 rounded-lg font-semibold transition-all flex items-center gap-1.5 ${
                 reportType === 'citizen'
-                  ? 'bg-white text-emerald-800 shadow-xs'
+                  ? 'bg-emerald-700 text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -354,7 +356,7 @@ ${aqiCat.healthImpact}
               <div className="flex bg-slate-100 p-0.5 rounded-lg">
                 <button
                   onClick={() => setLanguage('en')}
-                  className={`px-2.5 py-1 rounded font-semibold ${
+                  className={`px-2.5 py-1 rounded-md font-semibold ${
                     language === 'en' ? 'bg-white text-emerald-800 shadow-xs' : 'text-slate-600'
                   }`}
                 >
@@ -362,11 +364,11 @@ ${aqiCat.healthImpact}
                 </button>
                 <button
                   onClick={() => setLanguage('hi')}
-                  className={`px-2.5 py-1 rounded font-semibold ${
+                  className={`px-2.5 py-1 rounded-md font-semibold ${
                     language === 'hi' ? 'bg-white text-emerald-800 shadow-xs' : 'text-slate-600'
                   }`}
                 >
-                  हिंदी (Hindi)
+                  हिंदी
                 </button>
               </div>
             </div>
@@ -377,7 +379,7 @@ ${aqiCat.healthImpact}
               <div className="flex bg-slate-100 p-0.5 rounded-lg">
                 <button
                   onClick={() => setReadingLevel('standard')}
-                  className={`px-2.5 py-1 rounded font-semibold ${
+                  className={`px-2.5 py-1 rounded-md font-semibold ${
                     readingLevel === 'standard' ? 'bg-white text-emerald-800 shadow-xs' : 'text-slate-600'
                   }`}
                 >
@@ -385,7 +387,7 @@ ${aqiCat.healthImpact}
                 </button>
                 <button
                   onClick={() => setReadingLevel('simple')}
-                  className={`px-2.5 py-1 rounded font-semibold ${
+                  className={`px-2.5 py-1 rounded-md font-semibold ${
                     readingLevel === 'simple' ? 'bg-white text-emerald-800 shadow-xs' : 'text-slate-600'
                   }`}
                 >
@@ -398,17 +400,17 @@ ${aqiCat.healthImpact}
       </div>
 
       {/* Briefing Preview Card */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+      <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
         <div className="px-5 py-3 border-b border-slate-100 bg-slate-50 flex items-center justify-between text-xs font-semibold text-slate-600">
           <span>
-            Preview: {reportType === 'internal' ? 'Internal Civic Technical Briefing' : `Citizen Public Advisory (${language.toUpperCase()})`}
+            {reportType === 'internal' ? 'Internal Civic Technical Briefing' : `Citizen Public Advisory (${language.toUpperCase()})`}
           </span>
           <span className="font-mono text-[11px] text-slate-400">
-            Source: {source.provider} • Real Telemetry Backed
+            Source: {source.provider}
           </span>
         </div>
 
-        <div className="p-6 font-mono text-xs text-slate-800 bg-white overflow-x-auto whitespace-pre-wrap leading-relaxed max-h-[600px] overflow-y-auto">
+        <div className="p-6 font-mono text-xs text-slate-800 bg-white overflow-x-auto whitespace-pre-wrap leading-relaxed max-h-[500px] overflow-y-auto">
           {getActiveText()}
         </div>
       </div>

@@ -21,6 +21,7 @@ import { AlertTriangle, RefreshCw } from 'lucide-react';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<NavTab>('overview');
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState<boolean>(false);
   const [currentLocation, setCurrentLocation] = useState<CityLocation>(DEFAULT_CITIES[0]); // Default: Bhopal
   const [airData, setAirData] = useState<AirQualityResponse | null>(null);
   const [multiLocationsData, setMultiLocationsData] = useState<AirQualityResponse[]>([]);
@@ -67,12 +68,10 @@ export default function Home() {
       setApiError(null);
 
       try {
-        // Fetch current city
         const mainData = await fetchAirQuality(currentLocation);
         if (!isMounted) return;
         setAirData(mainData);
 
-        // Preload multi-locations for immediate comparison capability
         const citiesToPreload = [DEFAULT_CITIES[0], DEFAULT_CITIES[1], DEFAULT_CITIES[2]];
         const multiResults: AirQualityResponse[] = [];
 
@@ -170,7 +169,7 @@ export default function Home() {
         lon: airData.location.longitude,
       },
       provider: airData.source.provider,
-      classification: airData.source.classification === 'model_estimate' ? 'Model Estimate (CAMS)' : 'Station Observed',
+      classification: 'Model Estimate (CAMS)',
       current: airData.current,
       analysis: geminiAnalysis ?? undefined,
     };
@@ -212,7 +211,6 @@ export default function Home() {
 
   // Load a previous snapshot into view
   const handleLoadSnapshot = (snapshot: ReportSnapshot) => {
-    // If the snapshot has an analysis, set it
     if (snapshot.analysis) {
       setGeminiAnalysis(snapshot.analysis);
       setActiveTab('intelligence');
@@ -223,16 +221,18 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen bg-slate-50 text-slate-900">
-      {/* Sidebar Navigation */}
+      {/* Sidebar Navigation (Desktop persistent, mobile drawer) */}
       <Sidebar
         activeTab={activeTab}
         onSelectTab={setActiveTab}
         savedCount={snapshots.length}
+        isMobileOpen={isMobileNavOpen}
+        onCloseMobile={() => setIsMobileNavOpen(false)}
       />
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Sticky Header */}
+        {/* Compact Header */}
         <Header
           currentLocation={currentLocation}
           onSelectLocation={handleSelectLocation}
@@ -241,24 +241,25 @@ export default function Home() {
           onRefresh={() => handleSelectLocation(currentLocation)}
           onSaveSnapshot={handleSaveSnapshot}
           savedFeedback={savedFeedback}
+          onOpenMobileNav={() => setIsMobileNavOpen(true)}
         />
 
-        {/* Global API Error Notice (Never hidden or silently replaced!) */}
+        {/* Global API Error Notice */}
         {apiError && (
-          <div className="m-6 p-4 rounded-2xl bg-rose-50 border border-rose-300 text-rose-900 flex items-start justify-between gap-4">
+          <div className="m-4 md:m-6 p-4 rounded-2xl bg-white border border-rose-200 text-rose-900 flex items-start justify-between gap-4 shadow-xs">
             <div className="flex items-start gap-3">
               <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
               <div>
                 <h4 className="text-sm font-bold">API Connection Error</h4>
-                <p className="text-xs text-rose-800 mt-0.5">{apiError}</p>
-                <p className="text-[11px] text-rose-700 mt-1 italic">
-                  AirSathi maintains strict scientific integrity: we never substitute fake or simulated readings when live APIs encounter errors.
+                <p className="text-xs text-rose-700 mt-0.5">{apiError}</p>
+                <p className="text-[11px] text-slate-400 mt-1 italic">
+                  AirSathi maintains strict scientific integrity: real public API connectivity is required.
                 </p>
               </div>
             </div>
             <button
               onClick={() => handleSelectLocation(currentLocation)}
-              className="px-3 py-1.5 rounded-lg bg-rose-600 text-white text-xs font-semibold hover:bg-rose-700 flex items-center gap-1 shrink-0"
+              className="px-3 py-1.5 rounded-lg bg-emerald-700 text-white text-xs font-semibold hover:bg-emerald-800 flex items-center gap-1 shrink-0"
             >
               <RefreshCw className="w-3.5 h-3.5" />
               Retry
@@ -267,7 +268,7 @@ export default function Home() {
         )}
 
         {/* Tab Views */}
-        <main className="flex-1 p-6 max-w-7xl w-full mx-auto">
+        <main className="flex-1 p-4 md:p-6 w-full">
           {activeTab === 'overview' && (
             <OverviewTab
               airData={airData}
@@ -275,6 +276,7 @@ export default function Home() {
               onNavigate={setActiveTab}
               onRefresh={() => handleSelectLocation(currentLocation)}
               onRunIntelligence={handleRunGeminiIntelligence}
+              geminiAnalysis={geminiAnalysis}
             />
           )}
 
@@ -292,16 +294,6 @@ export default function Home() {
               loading={analyzing}
               onRunAnalysis={handleRunGeminiIntelligence}
               airData={airData}
-            />
-          )}
-
-          {activeTab === 'trends' && (
-            <HotspotsTrendsTab
-              currentAirData={airData}
-              multiLocationsData={multiLocationsData}
-              onAddLocation={handleAddLocationToComparison}
-              onRemoveLocation={handleRemoveLocationFromComparison}
-              onSelectActiveLocation={handleSelectLocation}
             />
           )}
 
