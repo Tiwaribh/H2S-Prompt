@@ -135,6 +135,7 @@ export const Header: React.FC<HeaderProps> = ({
               <div className="flex items-center gap-2 pl-2 border-l border-slate-200">
                 <div className="flex items-center gap-2" title={user.email || user.displayName || 'Google User'}>
                   {user.photoURL ? (
+                    // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={user.photoURL}
                       alt={user.displayName || 'User Profile'}

@@ -23,6 +23,7 @@ export const LocationModal: React.FC<LocationModalProps> = ({
   const [customLon, setCustomLon] = useState('');
   const [customName, setCustomName] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const searchCache = React.useRef<Record<string, CityLocation[]>>({});
 
   // Close on Escape key press
   useEffect(() => {
@@ -40,15 +41,22 @@ export const LocationModal: React.FC<LocationModalProps> = ({
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!query.trim() || query.trim().length < 2) return;
+    const cleanQuery = query.trim().toLowerCase();
+    if (!cleanQuery || cleanQuery.length < 2) return;
+
+    if (searchCache.current[cleanQuery]) {
+      setResults(searchCache.current[cleanQuery]);
+      return;
+    }
 
     setSearching(true);
     setErrorMsg('');
 
     try {
-      const res = await fetch(`/api/geocode?q=${encodeURIComponent(query.trim())}`);
+      const res = await fetch(`/api/geocode?q=${encodeURIComponent(cleanQuery)}`);
       const data = await res.json();
       if (data.results && data.results.length > 0) {
+        searchCache.current[cleanQuery] = data.results;
         setResults(data.results);
       } else {
         setResults([]);

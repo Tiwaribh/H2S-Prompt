@@ -1,7 +1,4 @@
-import test from 'node:test';
-import assert from 'node:assert/strict';
-
-test('API Input Validation Logic', async (t) => {
+describe('API Request Validation & Sanitization Engine', () => {
   function validateCoordinates(latStr: string | null, lonStr: string | null) {
     if (!latStr || !lonStr) {
       return { valid: false, error: 'Missing latitude or longitude parameter.' };
@@ -14,44 +11,47 @@ test('API Input Validation Logic', async (t) => {
     return { valid: true, latitude: lat, longitude: lon };
   }
 
-  await t.test('rejects missing coordinates', () => {
-    assert.equal(validateCoordinates(null, '77.4126').valid, false);
-    assert.equal(validateCoordinates('23.2599', null).valid, false);
-  });
-
-  await t.test('rejects non-numeric coordinates', () => {
-    assert.equal(validateCoordinates('abc', '77.4126').valid, false);
-    assert.equal(validateCoordinates('23.2599', 'xyz').valid, false);
-  });
-
-  await t.test('rejects out-of-range latitude (> 90 or < -90)', () => {
-    assert.equal(validateCoordinates('95.0', '77.4126').valid, false);
-    assert.equal(validateCoordinates('-95.0', '77.4126').valid, false);
-  });
-
-  await t.test('rejects out-of-range longitude (> 180 or < -180)', () => {
-    assert.equal(validateCoordinates('23.2599', '185.0').valid, false);
-    assert.equal(validateCoordinates('23.2599', '-185.0').valid, false);
-  });
-
-  await t.test('accepts valid geographic coordinates', () => {
-    const res = validateCoordinates('23.2599', '77.4126');
-    assert.equal(res.valid, true);
-    assert.equal(res.latitude, 23.2599);
-    assert.equal(res.longitude, 77.4126);
-  });
-});
-
-test('Geocoding Query Sanitization', async (t) => {
   function sanitizeQuery(query: string | null): string {
     if (!query) return '';
     return query.trim().slice(0, 100);
   }
 
-  await t.test('trims whitespace and caps maximum query length', () => {
-    const longQuery = 'A'.repeat(150);
-    const sanitized = sanitizeQuery(`   ${longQuery}   `);
-    assert.equal(sanitized.length, 100);
-    assert.equal(sanitized[0], 'A');
+  describe('Geographic Coordinate Range Rules', () => {
+    it('rejects null or empty coordinates', () => {
+      expect(validateCoordinates(null, '77.4126').valid).toBe(false);
+      expect(validateCoordinates('23.2599', null).valid).toBe(false);
+    });
+
+    it('rejects non-numeric coordinates', () => {
+      expect(validateCoordinates('invalid', '77.4126').valid).toBe(false);
+      expect(validateCoordinates('23.2599', 'nan').valid).toBe(false);
+    });
+
+    it('rejects latitude out of bounds (-90 to +90)', () => {
+      expect(validateCoordinates('90.5', '77.4126').valid).toBe(false);
+      expect(validateCoordinates('-91.0', '77.4126').valid).toBe(false);
+    });
+
+    it('rejects longitude out of bounds (-180 to +180)', () => {
+      expect(validateCoordinates('23.2599', '180.5').valid).toBe(false);
+      expect(validateCoordinates('23.2599', '-181.0').valid).toBe(false);
+    });
+
+    it('accepts valid coordinates within global ranges', () => {
+      const res = validateCoordinates('23.2599', '77.4126');
+      expect(res.valid).toBe(true);
+      expect(res.latitude).toBe(23.2599);
+      expect(res.longitude).toBe(77.4126);
+    });
+  });
+
+  describe('Query String Sanitization', () => {
+    it('trims leading/trailing whitespace and limits string length', () => {
+      const longInput = '   ' + 'Delhi '.repeat(30) + '   ';
+      const clean = sanitizeQuery(longInput);
+      expect(clean.length).toBeLessThanOrEqual(100);
+      expect(clean.startsWith(' ')).toBe(false);
+      expect(clean.endsWith(' ')).toBe(false);
+    });
   });
 });

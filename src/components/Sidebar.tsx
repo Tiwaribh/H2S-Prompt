@@ -135,14 +135,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
         })}
       </nav>
 
-      {/* Compact Status Indicator */}
-      <div className="p-4 border-t border-slate-100 bg-slate-50/50 text-[11px] text-slate-500 space-y-1">
-        <div className="flex items-center gap-2 font-medium text-slate-700">
-          <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-          <span>Open-Meteo CAMS Active</span>
+      {/* Compact Status & Multi-Source Disclosure Indicator */}
+      <div className="p-3.5 border-t border-slate-100 bg-slate-50/70 text-[11px] text-slate-500 space-y-1.5">
+        <div className="flex items-center justify-between font-medium text-slate-700">
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>Open-Meteo CAMS</span>
+          </div>
+          <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+            Active
+          </span>
         </div>
-        <p className="text-[10px] text-slate-400 leading-tight">
-          Real-time atmospheric model simulation.
+        <div className="flex items-center justify-between text-[10px] text-slate-400">
+          <span>CPCB / Data.gov.in</span>
+          <span className="text-[9px] text-slate-500 bg-slate-100 px-1 py-0.5 rounded">
+            Configurable
+          </span>
+        </div>
+        <p className="text-[10px] text-slate-400 leading-tight pt-1 border-t border-slate-200/60">
+          CAMS atmospheric model (~11-40km grid).
         </p>
       </div>
     </div>

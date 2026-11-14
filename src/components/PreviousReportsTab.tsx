@@ -78,7 +78,7 @@ export const PreviousReportsTab: React.FC<PreviousReportsTabProps> = ({
           <History className="w-10 h-10 text-slate-300 mx-auto" />
           <h3 className="text-sm font-bold text-slate-800">No Previous Snapshots Saved</h3>
           <p className="text-xs text-slate-500 max-w-sm mx-auto">
-            Click "Save" in the top header while viewing any city's live air data to benchmark future changes.
+            Click &quot;Save&quot; in the top header while viewing any city&apos;s live air data to benchmark future changes.
           </p>
         </div>
       ) : (

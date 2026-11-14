@@ -46,7 +46,7 @@ NEXT_PUBLIC_FIREBASE_APP_ID="your-app-id"`;
               <p className="text-xs font-semibold text-emerald-700">Civic Air Intelligence</p>
             </div>
             <p className="text-xs text-slate-500 italic max-w-xs leading-relaxed">
-              "From live air quality data to local action."
+              &ldquo;From live air quality data to local action.&rdquo;
             </p>
           </div>
 

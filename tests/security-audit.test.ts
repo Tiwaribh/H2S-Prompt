@@ -1,14 +1,12 @@
-import test from 'node:test';
-import assert from 'node:assert/strict';
-import fs from 'node:fs';
-import path from 'node:path';
+import fs from 'fs';
+import path from 'path';
 
-test('Security & Architecture Audit', async (t) => {
+describe('Security & Zero-Database Compliance Audit', () => {
   const rootDir = process.cwd();
   const packageJson = JSON.parse(fs.readFileSync(path.join(rootDir, 'package.json'), 'utf-8'));
   const gitignoreContent = fs.readFileSync(path.join(rootDir, '.gitignore'), 'utf-8');
 
-  await t.test('ZERO-DATABASE INVARIANT: No persistent backend database libraries installed', () => {
+  it('ZERO-DATABASE INVARIANT: No persistent backend database libraries in dependencies', () => {
     const allDeps = {
       ...(packageJson.dependencies || {}),
       ...(packageJson.devDependencies || {}),
@@ -32,22 +30,25 @@ test('Security & Architecture Audit', async (t) => {
     ];
 
     for (const pkg of databasePackages) {
-      assert.ok(
-        !allDeps[pkg],
-        `Security policy violation: prohibited database package "${pkg}" detected in dependencies.`
-      );
+      expect(allDeps[pkg]).toBeUndefined();
     }
   });
 
-  await t.test('ENVIRONMENT PROTECTION: Gitignore strictly ignores environment secrets and service accounts', () => {
-    assert.ok(gitignoreContent.includes('.env*.local'), 'Missing .env*.local in .gitignore');
-    assert.ok(gitignoreContent.includes('*serviceAccount*.json'), 'Missing *serviceAccount*.json in .gitignore');
-    assert.ok(gitignoreContent.includes('*credentials*.json'), 'Missing *credentials*.json in .gitignore');
+  it('ENVIRONMENT PROTECTION: Gitignore strictly ignores environment secrets and service accounts', () => {
+    expect(gitignoreContent).toContain('.env*.local');
+    expect(gitignoreContent).toContain('*serviceAccount*.json');
+    expect(gitignoreContent).toContain('*credentials*.json');
   });
 
-  await t.test('API KEY SAFETY: Server-only Gemini API key is never prefixed with NEXT_PUBLIC_', () => {
+  it('API KEY SAFETY: Server-only Gemini API key is never prefixed with NEXT_PUBLIC_', () => {
     const envExample = fs.readFileSync(path.join(rootDir, '.env.example'), 'utf-8');
-    assert.ok(!envExample.includes('NEXT_PUBLIC_GEMINI_API_KEY'), 'Gemini API key must never have NEXT_PUBLIC_ prefix.');
-    assert.ok(envExample.includes('GEMINI_API_KEY='), 'GEMINI_API_KEY must be a backend server environment variable.');
+    expect(envExample).not.toContain('NEXT_PUBLIC_GEMINI_API_KEY');
+    expect(envExample).toContain('GEMINI_API_KEY=');
+  });
+
+  it('PROBLEM STATEMENT INTEGRITY: Documents secondary provider environment variables (CPCB & OpenAQ)', () => {
+    const envExample = fs.readFileSync(path.join(rootDir, '.env.example'), 'utf-8');
+    expect(envExample).toContain('DATA_GOV_IN_API_KEY');
+    expect(envExample).toContain('OPENAQ_API_KEY');
   });
 });
