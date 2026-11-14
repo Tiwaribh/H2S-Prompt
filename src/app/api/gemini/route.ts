@@ -14,8 +14,7 @@ function generateDeterministicAnalysis(airData: any, comparisons: any[] = []): a
   const o3 = airData?.current?.ozone ?? 'N/A';
   const time = airData?.current?.time || new Date().toISOString();
   const provider = airData?.source?.provider || 'Open-Meteo Air Quality API';
-  const isModel = airData?.source?.classification === 'model_estimate';
-  const dataType = isModel ? 'Model estimate (CAMS)' : 'Station observed (CPCB)';
+  const dataType = 'Model estimate (CAMS)' as const;
 
   const aqiNum = typeof aqi === 'number' ? aqi : 50;
   let severity = 'Good';
@@ -33,9 +32,8 @@ function generateDeterministicAnalysis(airData: any, comparisons: any[] = []): a
       timestamp: time,
       data_provider: provider,
       data_type: dataType,
-      confidence_and_limitations: isModel
-        ? 'High regional confidence from CAMS numerical ensemble; does not capture hyper-local street canopy variations.'
-        : 'Physical monitoring station sensor reading.',
+      confidence_and_limitations:
+        'High regional confidence from CAMS numerical atmospheric ensemble (~11-40km grid); does not capture hyper-local street canopy variations.',
       interpretation:
         typeof pm25 === 'number' && pm25 > 60
           ? `Elevated fine respirable particles (${pm25} µg/m³) exceeding standard thresholds, posing pulmonary stress.`
@@ -72,7 +70,7 @@ function generateDeterministicAnalysis(airData: any, comparisons: any[] = []): a
     },
     {
       location: locName,
-      pollutant: 'CO & SO2 & Ozone',
+      pollutant: 'CO, SO2 & Ozone',
       source_value: `CO: ${co}, SO2: ${so2}, O3: ${o3}`,
       unit: 'µg/m³',
       timestamp: time,
@@ -102,7 +100,7 @@ function generateDeterministicAnalysis(airData: any, comparisons: any[] = []): a
   }
 
   return {
-    executive_summary: `Live ambient air quality analysis for ${locName} indicates an AQI of ${aqi} (${severity}) based on ${provider} ${dataType.toLowerCase()}. Primary active particulate loading is driven by PM2.5 (${pm25} µg/m³) and PM10 (${pm10} µg/m³). Actionable civic interventions should prioritize dust suppression and idling controls.`,
+    executive_summary: `Live ambient air quality analysis for ${locName} indicates an AQI of ${aqi} (${severity}) based on ${provider} model estimates. Primary active particulate loading is driven by PM2.5 (${pm25} µg/m³) and PM10 (${pm10} µg/m³). Actionable civic interventions should prioritize dust suppression and idling controls.`,
     overall_assessment: `The recorded AQI of ${aqi} places ${locName} in the ${severity} air-quality tier. Note: Because readings originate from atmospheric simulation grid cells (~11-40km), local street-level microclimates may exhibit localized variance.`,
     key_findings: findings,
     trends: [
@@ -126,7 +124,7 @@ function generateDeterministicAnalysis(airData: any, comparisons: any[] = []): a
         type: dataType,
         completeness: '100% of standard criteria pollutants retrieved from Open-Meteo',
         uncertainty_notes:
-          'Data derived from ECMWF/CAMS global atmospheric forecast models with assimilated satellite retrievals. Reflects 0.25° grid average; does not substitute certified CPCB continuous ambient air quality monitoring stations (CAAQMS).',
+          'Data derived from ECMWF/CAMS global atmospheric forecast models with assimilated satellite retrievals. Reflects 0.1° to 0.25° grid average.',
       },
     ],
     priority_actions: [
@@ -189,11 +187,9 @@ export async function POST(request: NextRequest) {
 
     const apiKey = process.env.GEMINI_API_KEY;
 
-    // If Gemini key is available, attempt AI inference
     if (apiKey && apiKey.trim().length > 5) {
       try {
         const genAI = new GoogleGenerativeAI(apiKey);
-        // Using gemini-1.5-flash for fast and reliable structured JSON output
         const model = genAI.getGenerativeModel({
           model: 'gemini-1.5-flash',
           generationConfig: {
@@ -203,14 +199,13 @@ export async function POST(request: NextRequest) {
         });
 
         const prompt = `You are the Civic Air Intelligence Engine of AirSathi, a civic technology platform for Indian municipalities and citizens.
-You are evaluating REAL live air quality data retrieved from public APIs.
+You are evaluating REAL live air quality data retrieved from the Open-Meteo Air Quality API (CAMS model estimates).
 
 NON-NEGOTIABLE REQUIREMENTS:
 1. DO NOT invent, hallucinate, or fabricate any pollutant readings or AQI values.
 2. Every finding MUST cite the EXACT values, units, and timestamps provided in the input JSON below.
-3. CLEARLY distinguish model estimates (Open-Meteo / CAMS) from physical monitoring-station measurements (CPCB).
-4. State explicit limitations: Open-Meteo values are atmospheric model simulations over ~10-40km grid cells, not hyper-local street sensors.
-5. Provide realistic, non-sensational civic recommendations for Indian urban stakeholders (Ward Officers, Housing Societies, School Administrators).
+3. State explicit limitations: Values are atmospheric model simulations over ~10-40km grid cells, not hyper-local street sensors.
+4. Provide realistic, non-sensational civic recommendations for Indian urban stakeholders (Ward Officers, Housing Societies, School Administrators).
 
 INPUT TELEMETRY:
 ${JSON.stringify({ airQualityData, locationsComparison }, null, 2)}
@@ -227,7 +222,7 @@ Return ONLY valid JSON matching this exact structure:
       "unit": "string",
       "timestamp": "string",
       "data_provider": "string",
-      "data_type": "Model estimate (CAMS)" or "Station observed (CPCB)",
+      "data_type": "Model estimate (CAMS)",
       "confidence_and_limitations": "string",
       "interpretation": "string"
     }
@@ -283,11 +278,9 @@ Return ONLY valid JSON matching this exact structure:
         return NextResponse.json(parsed);
       } catch (geminiError: any) {
         console.warn('Gemini API call failed, falling back to deterministic intelligence engine:', geminiError);
-        // Fall through to deterministic engine
       }
     }
 
-    // Deterministic intelligence engine grounded in real data
     const deterministicResult = generateDeterministicAnalysis(airQualityData, locationsComparison);
     return NextResponse.json(deterministicResult);
   } catch (err: any) {

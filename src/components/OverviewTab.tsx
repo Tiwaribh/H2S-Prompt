@@ -2,21 +2,16 @@
 
 import React from 'react';
 import {
-  ShieldAlert,
   Wind,
   AlertTriangle,
   Info,
   BrainCircuit,
   ArrowRight,
   MapPin,
-  Clock,
-  Compass,
-  CheckCircle2,
-  Database,
+  ShieldAlert,
   Layers,
 } from 'lucide-react';
-import { AirQualityResponse, CityLocation } from '@/lib/types';
-import { AQIBadge } from './AQIBadge';
+import { AirQualityResponse } from '@/lib/types';
 import { getAQICategory, formatTime } from '@/lib/aqi-utils';
 
 interface OverviewTabProps {
@@ -124,8 +119,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
           </div>
           <p className="text-teal-800 leading-relaxed">
             Data retrieved live from <strong>{source.provider}</strong> ({source.model}). These values represent
-            atmosphere numerical model simulations (~11-40km grid cell) assimilated with satellite retrievals, not direct
-            physical CAAQMS station telemetry. {gridDisclosure}
+            atmospheric numerical model simulations (~11-40km grid cell) assimilated with satellite retrievals. {gridDisclosure}
           </p>
         </div>
       </div>
@@ -249,8 +243,8 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
               <span className="font-semibold text-slate-700 block">{location.elevation ?? 0} meters</span>
             </div>
             <div>
-              <span className="text-slate-400 block font-medium">CPCB Status:</span>
-              <span className="font-semibold text-amber-700 block">Requires API Key</span>
+              <span className="text-slate-400 block font-medium">Forecast Horizon:</span>
+              <span className="font-semibold text-emerald-700 block">72 Hours Live</span>
             </div>
           </div>
         </div>

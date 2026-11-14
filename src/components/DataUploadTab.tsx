@@ -144,7 +144,7 @@ Mumbai,Bandra Kurla,44.2,88.1,28.4,110,2026-11-14 09:00`;
         <div className="text-xs space-y-1">
           <div className="font-bold">DATA INTEGRITY & ISOLATION RULE</div>
           <p className="text-amber-900 leading-relaxed">
-            Uploaded CSV readings are analyzed strictly in isolation and tagged with an explicit <strong>"Uploaded Data (Non-API)"</strong> classification. AirSathi never silently mixes external uploaded files with live Open-Meteo or CPCB public API streams.
+            Uploaded CSV readings are analyzed strictly in isolation and tagged with an explicit <strong>"Uploaded Data (Non-API)"</strong> classification. AirSathi never silently mixes external uploaded files with live Open-Meteo public API streams.
           </p>
         </div>
       </div>

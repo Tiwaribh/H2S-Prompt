@@ -41,9 +41,10 @@ export interface AirQualityResponse {
   source: {
     provider: string;
     model: string;
-    classification: 'model_estimate' | 'station_observed';
+    classification: 'model_estimate';
     description: string;
     retrievedAt: string;
+    gridCell?: string;
   };
   gridDisclosure?: string;
 }
@@ -55,7 +56,7 @@ export interface GeminiFinding {
   unit: string;
   timestamp: string;
   data_provider: string;
-  data_type: 'Model estimate (CAMS)' | 'Station observed (CPCB)';
+  data_type: 'Model estimate (CAMS)';
   confidence_and_limitations: string;
   interpretation: string;
 }

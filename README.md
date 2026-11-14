@@ -10,7 +10,7 @@ AirSathi is an API-driven civic intelligence dashboard built for the Google for 
 
 - **Zero Hardcoded Data**: AirSathi does **not** use static, hardcoded, or simulated AQI values or criteria pollutant levels.
 - **Genuine Public APIs**: All telemetry is fetched live from Open-Meteo Air Quality API (backed by the European Centre for Medium-Range Weather Forecasts Copernicus Atmosphere Monitoring Service - ECMWF CAMS).
-- **Clear Classification**: Open-Meteo values are explicitly disclosed as **atmospheric model estimates** (~11-40km grid cells), not physical monitoring stations.
+- **Clear Classification**: Open-Meteo values are explicitly disclosed as **atmospheric model estimates** (~11-40km grid cells).
 - **No Ward-Level Hallucination**: Municipalities within the same model grid cell are not assigned fabricated neighborhood differences.
 - **Strict Error Handling**: If an API is unreachable, the system displays a clear error state and explanation without silently substituting fake demo numbers.
 
@@ -35,7 +35,7 @@ AirSathi is an API-driven civic intelligence dashboard built for the Google for 
 
 4. **Data Intelligence Layer – Google Gemini (`/api/gemini`)**:
    - Structured JSON response (`executive_summary`, `overall_assessment`, `key_findings`, `trends`, `location_comparison`, `data_quality`, `priority_actions`, `health_advisory`).
-   - Every finding cites exact real source values, units, timestamps, data provider, and model vs station classification.
+   - Every finding cites exact real source values, units, timestamps, data provider, and model classification.
    - Integrated deterministic civic air engine fallback for offline/development operation.
 
 5. **Stakeholder-Based Action Matrix (`Action Recommendations Tab`)**:
@@ -71,8 +71,6 @@ AirSathi is an API-driven civic intelligence dashboard built for the Google for 
 |---|---|---|---|
 | **Open-Meteo Air Quality API** | **Active (Primary)** | Model Estimate (CAMS) | Real-time PM2.5, PM10, NO2, SO2, CO, O3, US AQI, European AQI, 72h forecast |
 | **Open-Meteo Geocoding API** | **Active (Primary)** | Spatial Reference | Dynamic city and coordinate search for Indian locations |
-| **Central Pollution Control Board (CPCB) / Data.gov.in** | **Integrated (Secondary)** | Physical Station Observed | National AQI CAAQMS station telemetry (activated with `DATA_GOV_IN_API_KEY`) |
-| **OpenAQ v3 API** | **Integrated (Optional)** | Physical Station Observed | International civic sensor network (activated with `OPENAQ_API_KEY`) |
 | **Google Gemini API** | **Active (Intelligence)** | Generative AI Layer | Structured civic intelligence analysis and recommendations grounded in API telemetry |
 
 ---
@@ -88,12 +86,6 @@ Create a `.env.local` file in the project root:
 ```env
 # Optional: Google Gemini API key (defaults to deterministic grounded engine if omitted)
 GEMINI_API_KEY="your-gemini-api-key"
-
-# Optional: Data.gov.in API key for CPCB monitoring stations
-DATA_GOV_IN_API_KEY="your-data-gov-in-api-key"
-
-# Optional: OpenAQ v3 API key
-OPENAQ_API_KEY="your-openaq-api-key"
 ```
 
 ### 2. Install & Run

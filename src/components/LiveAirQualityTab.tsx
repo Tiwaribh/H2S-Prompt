@@ -1,20 +1,14 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import {
-  Wind,
-  Layers,
-  Database,
-  Info,
-  CheckCircle2,
-  AlertCircle,
-  ExternalLink,
   MapPin,
   Clock,
-  Key,
+  Info,
+  Cpu,
+  BookmarkCheck,
 } from 'lucide-react';
 import { AirQualityResponse } from '@/lib/types';
-import { AQIBadge } from './AQIBadge';
 import { getAQICategory, formatTime } from '@/lib/aqi-utils';
 
 interface LiveAirQualityTabProps {
@@ -25,11 +19,7 @@ interface LiveAirQualityTabProps {
 
 export const LiveAirQualityTab: React.FC<LiveAirQualityTabProps> = ({
   airData,
-  loading,
-  onRefresh,
 }) => {
-  const [showKeyInstructions, setShowKeyInstructions] = useState(false);
-
   if (!airData) {
     return (
       <div className="p-8 text-center text-slate-500">
@@ -151,7 +141,7 @@ export const LiveAirQualityTab: React.FC<LiveAirQualityTabProps> = ({
 
         <div className="flex items-center gap-2">
           <span className="text-xs font-semibold px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
-            Primary API Active
+            Open-Meteo Live API Active
           </span>
           <span className="text-xs font-semibold px-3 py-1 rounded-full bg-teal-50 text-teal-800 border border-teal-200">
             Model Estimate (CAMS)
@@ -193,83 +183,64 @@ export const LiveAirQualityTab: React.FC<LiveAirQualityTabProps> = ({
         ))}
       </div>
 
-      {/* Public Dataset Integration Cards: CPCB and OpenAQ */}
+      {/* Atmospheric Specifications and NAAQS Standards Panels */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* CPCB / data.gov.in integration card */}
-        <div className="p-5 rounded-2xl border border-amber-200 bg-amber-50/60 flex flex-col justify-between">
+        {/* Model Specifications */}
+        <div className="p-5 rounded-2xl border border-teal-200 bg-teal-50/60 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-amber-900 flex items-center gap-1.5">
-                <Database className="w-4 h-4 text-amber-700" />
-                CPCB / Data.gov.in Official Stations
+              <span className="text-xs font-bold uppercase tracking-wider text-teal-900 flex items-center gap-1.5">
+                <Cpu className="w-4 h-4 text-teal-700" />
+                Atmospheric Modeling & Sensor Assimilation
               </span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-200 text-amber-900">
-                Secondary Integration
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-teal-200 text-teal-900">
+                ECMWF CAMS
               </span>
             </div>
-            <p className="text-xs text-amber-900 leading-relaxed mb-3">
-              Official Indian Continuous Ambient Air Quality Monitoring Stations (CAAQMS) are managed through the National AQI dataset on Data.gov.in.
+            <p className="text-xs text-teal-900 leading-relaxed mb-3">
+              The Copernicus Atmosphere Monitoring Service combines satellite optical retrievals, meteorological fields, and numerical dispersion models to produce continuous spatial coverage across India.
             </p>
-            <div className="p-3 bg-white/80 rounded-xl border border-amber-200/80 text-xs text-amber-950 space-y-1.5">
+            <div className="p-3 bg-white/80 rounded-xl border border-teal-200/80 text-xs text-teal-950 space-y-1.5">
               <div className="flex items-center justify-between font-medium">
-                <span>Integration State:</span>
-                <span className="font-bold text-amber-800">Requires DATA_GOV_IN_API_KEY</span>
+                <span>Model Pipeline:</span>
+                <span className="font-bold text-teal-800">CAMS Global & Regional Ensemble</span>
               </div>
-              <p className="text-[11px] text-amber-800">
-                To prevent simulated data, official CAAQMS station telemetry will only render when valid Data.gov.in credentials are supplied in the server environment. Currently, all values displayed are genuine Open-Meteo CAMS numerical model forecasts.
+              <div className="flex items-center justify-between font-medium">
+                <span>Grid Spatial Resolution:</span>
+                <span className="font-bold text-teal-800">~11 km to 40 km (0.1°–0.25°)</span>
+              </div>
+              <p className="text-[11px] text-teal-800 pt-1">
+                {gridDisclosure}
               </p>
             </div>
           </div>
-
-          <div className="pt-3 mt-3 flex items-center justify-between text-xs">
-            <a
-              href="https://www.data.gov.in/catalog/real-time-air-quality-index"
-              target="_blank"
-              rel="noreferrer"
-              className="text-amber-800 font-semibold hover:underline inline-flex items-center gap-1"
-            >
-              <span>Explore Data.gov.in Catalog</span>
-              <ExternalLink className="w-3.5 h-3.5" />
-            </a>
-          </div>
         </div>
 
-        {/* OpenAQ API v3 integration card */}
+        {/* National Air Quality Standard Reference */}
         <div className="p-5 rounded-2xl border border-blue-200 bg-blue-50/60 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-bold uppercase tracking-wider text-blue-900 flex items-center gap-1.5">
-                <Database className="w-4 h-4 text-blue-700" />
-                OpenAQ Global Network (v3 API)
+                <BookmarkCheck className="w-4 h-4 text-blue-700" />
+                National Ambient Air Quality Standards (NAAQS)
               </span>
               <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-200 text-blue-900">
-                Optional Source
+                Benchmarks
               </span>
             </div>
             <p className="text-xs text-blue-900 leading-relaxed mb-3">
-              OpenAQ aggregates government and low-cost sensor data globally under the modern v3 API format.
+              Official Indian regulatory thresholds used by municipal ward officers and civic authorities to evaluate ambient environmental compliance.
             </p>
             <div className="p-3 bg-white/80 rounded-xl border border-blue-200/80 text-xs text-blue-950 space-y-1.5">
-              <div className="flex items-center justify-between font-medium">
-                <span>Integration State:</span>
-                <span className="font-bold text-blue-800">Requires OPENAQ_API_KEY</span>
+              <div className="grid grid-cols-2 gap-2 text-[11px]">
+                <div>PM2.5 Limit: <strong>60 µg/m³</strong> (24-hr)</div>
+                <div>PM10 Limit: <strong>100 µg/m³</strong> (24-hr)</div>
+                <div>NO2 Limit: <strong>80 µg/m³</strong> (24-hr)</div>
+                <div>SO2 Limit: <strong>80 µg/m³</strong> (24-hr)</div>
+                <div>CO Limit: <strong>2000 µg/m³</strong> (8-hr)</div>
+                <div>Ozone Limit: <strong>100 µg/m³</strong> (8-hr)</div>
               </div>
-              <p className="text-[11px] text-blue-800">
-                Ready for optional v3 telemetry ingestion when configured. Does not block live MVP operations.
-              </p>
             </div>
-          </div>
-
-          <div className="pt-3 mt-3 flex items-center justify-between text-xs">
-            <a
-              href="https://api.openaq.org/v3"
-              target="_blank"
-              rel="noreferrer"
-              className="text-blue-800 font-semibold hover:underline inline-flex items-center gap-1"
-            >
-              <span>Explore OpenAQ Documentation</span>
-              <ExternalLink className="w-3.5 h-3.5" />
-            </a>
           </div>
         </div>
       </div>
