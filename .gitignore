@@ -25,6 +25,14 @@ next-env.d.ts
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Service Accounts, Private Keys, & Cloud Credentials
+*serviceAccount*.json
+*service-account*.json
+*firebase-adminsdk*.json
+*credentials*.json
+serviceAccountKey.json
+*.key
 *.pem
 
 # Debug Logs
