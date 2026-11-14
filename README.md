@@ -57,6 +57,12 @@ AirSathi is an API-driven civic intelligence dashboard built for the Google for 
    - Comparative delta engine calculates changes in AQI and pollutants (+/- delta and % change).
    - Enforces compatible unit, provider, and measurement matching; never treats missing values as zero.
 
+8. **Google-Only Authentication (Zero-Database Identity Verification)**:
+   - **Single Sign-On**: Single "Continue with Google" button using Firebase Client Auth.
+   - **Zero Database**: No database (Firestore, SQL, Mongo) is used. Identity is verified in-memory and persisted securely in client session storage (`browserLocalPersistence`).
+   - **Route Protection**: Unauthenticated visitors are gated behind the login screen; all dashboard views and telemetry fetching remain protected until authenticated.
+   - **User Profile Display**: Authenticated user's name and Google profile picture are displayed in the header with a one-click Sign Out option.
+
 ---
 
 ## 3. APIs Integrated & Classification
@@ -66,6 +72,7 @@ AirSathi is an API-driven civic intelligence dashboard built for the Google for 
 | **Open-Meteo Air Quality API** | **Active (Primary)** | Model Estimate (CAMS) | Real-time PM2.5, PM10, NO2, SO2, CO, O3, US AQI, European AQI, 72h forecast |
 | **Open-Meteo Geocoding API** | **Active (Primary)** | Spatial Reference | Dynamic city and coordinate search for Indian locations |
 | **Google Gemini API** | **Active (Intelligence)** | Generative AI Layer | Structured civic intelligence analysis and recommendations grounded in API telemetry |
+| **Google OAuth (Firebase)** | **Active (Auth Gate)** | Identity Verification | Secure, zero-database authentication session handling |
 
 ---
 
@@ -75,12 +82,20 @@ AirSathi is an API-driven civic intelligence dashboard built for the Google for 
 - Node.js 18+ (tested with Node.js v26)
 - npm 9+
 
-### 1. Environment Variables (Optional)
+### 1. Environment Configuration
 Create a `.env.local` file in the project root:
 ```env
 # Optional: Google Gemini API key (defaults to deterministic grounded engine if omitted)
 GEMINI_API_KEY="your-gemini-api-key"
+
+# Firebase Google OAuth Credentials (Client-side identity verification only)
+NEXT_PUBLIC_FIREBASE_API_KEY="your-firebase-api-key"
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN="your-app.firebaseapp.com"
+NEXT_PUBLIC_FIREBASE_PROJECT_ID="your-project-id"
+NEXT_PUBLIC_FIREBASE_APP_ID="your-app-id"
 ```
+
+> **Note**: If Firebase credentials are not yet configured in `.env.local`, the application displays the AirSathi Design A login card with an interactive, copyable configuration guide explaining how to create a free Firebase Web App and enable Google Sign-In.
 
 ### 2. Install & Run
 ```bash

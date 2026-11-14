@@ -10,15 +10,17 @@ import { HotspotsTrendsTab } from '@/components/HotspotsTrendsTab';
 import { RecommendationsTab } from '@/components/RecommendationsTab';
 import { BriefingsTab } from '@/components/BriefingsTab';
 import { PreviousReportsTab } from '@/components/PreviousReportsTab';
+import { LoginPage } from '@/components/LoginPage';
+import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { CityLocation, AirQualityResponse, GeminiAnalysisResult, ReportSnapshot } from '@/lib/types';
 import { DEFAULT_CITIES } from '@/lib/aqi-utils';
 import {
   saveSnapshotToStorage,
   getSnapshotsFromStorage,
 } from '@/lib/storage';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { AlertTriangle, RefreshCw, Wind } from 'lucide-react';
 
-export default function Home() {
+function AirSathiDashboard() {
   const [activeTab, setActiveTab] = useState<NavTab>('overview');
   const [isMobileNavOpen, setIsMobileNavOpen] = useState<boolean>(false);
   const [currentLocation, setCurrentLocation] = useState<CityLocation>(DEFAULT_CITIES[0]); // Default: Bhopal
@@ -315,5 +317,38 @@ export default function Home() {
         </main>
       </div>
     </div>
+  );
+}
+
+function AirSathiProtectedApp() {
+  const { user, loading } = useAuth();
+
+  // Loading state while checking Firebase authentication persistence
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 text-center select-none">
+        <div className="w-12 h-12 rounded-2xl bg-emerald-700 flex items-center justify-center text-white shadow-sm mb-4">
+          <Wind className="w-6 h-6 animate-pulse" />
+        </div>
+        <h2 className="text-base font-bold text-slate-800 tracking-tight">AirSathi</h2>
+        <p className="text-xs text-slate-500 mt-1">Verifying secure authentication session...</p>
+      </div>
+    );
+  }
+
+  // If user is unauthenticated, enforce strict route protection
+  if (!user) {
+    return <LoginPage />;
+  }
+
+  // Authenticated user gets full access to AirSathi Civic Intelligence Dashboard
+  return <AirSathiDashboard />;
+}
+
+export default function Home() {
+  return (
+    <AuthProvider>
+      <AirSathiProtectedApp />
+    </AuthProvider>
   );
 }
